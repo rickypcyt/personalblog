@@ -71,7 +71,7 @@ export default async function BlogPage() {
                 <div className="space-y-6 border-l border-gray-800 pl-4">
                   {posts.map((post, index) => (
                     <article key={index} className="group relative">
-                      <Link href={`/blog/${post.slug}`} className="block">
+                      <Link href={post.slug.startsWith('/') ? post.slug : `/blog/${post.slug}`} className="block">
                         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                           <h3 className="text-xl font-medium group-hover:text-gray-300 transition-colors">
                             {post.title}

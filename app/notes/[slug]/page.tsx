@@ -15,9 +15,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ 
   params 
 }: { 
-  params: { slug: string } 
+  params: Promise<{ slug: string }> 
 }): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   if (!slug) {
     return {
       title: 'Note not found',
@@ -47,14 +47,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function NotePage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function NotePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   
   if (!slug) {
     notFound();
   }
   
-  const note = await getNoteBySlug(params.slug);
+  const note = await getNoteBySlug(slug);
   
   if (!note) {
     notFound();

@@ -11,8 +11,8 @@ export async function generateStaticParams() {
   return slugs.map(slug => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   if (!slug) {
     return {
       title: 'Post not found',
@@ -42,8 +42,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   
   if (!slug) {
     notFound();
