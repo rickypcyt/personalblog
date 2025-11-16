@@ -1,0 +1,127 @@
+---
+title: "My Notes"
+description: "A collection of my personal notes and thoughts"
+---
+
+# My Notes
+
+Welcome to my personal knowledge base. Here you'll find a collection of my notes, thoughts, and learnings.
+
+## All Notes
+
+```jsx server
+import Link from 'next/link';
+import { getAllNotes } from '../actions/notes';
+
+export async function NoteList() {
+  const notes = await getAllNotes();
+  const isLoading = false;
+
+  if (isLoading) {
+    return <div className="text-center py-8">Loading notes...</div>;
+  }
+
+  if (notes.length === 0) {
+    return <div className="text-center py-8">No notes found. Create your first note!</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {notes.map((note) => (
+        <article key={note.slug} className="border border-gray-700 rounded-lg p-6 hover:bg-gray-800/50 transition-colors">
+          <Link href={`/notes/${note.slug}`}>
+            <h2 className="text-2xl font-bold text-blue-400 hover:text-blue-300 mb-2">
+              {note.title || 'Untitled Note'}
+            </h2>
+            {note.date && (
+              <p className="text-sm text-gray-400 mb-3">
+                {new Date(note.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+                {note.readTime && ` • ${note.readTime}`}
+              </p>
+            )}
+            {note.description && (
+              <p className="text-gray-300 mb-3">{note.description}</p>
+            )}
+            {note.category && (
+              <span className="inline-block bg-gray-700 text-gray-200 text-xs px-2 py-1 rounded">
+                {note.category}
+              </span>
+            )}
+          </Link>
+        </article>
+      ))}
+    </div>
+  );
+}
+```
+
+<NoteList />
+
+---
+
+## How to Use
+
+1. Create a new markdown file in the `app/notes` directory
+2. Add frontmatter with title, date, and other metadata
+3. Write your content using Markdown or MDX
+4. Save the file and it will appear in the list above
+
+### Example Note Structure
+
+```markdown
+---
+title: "My First Note"
+date: "2025-01-01"
+description: "This is my first note"
+category: "Getting Started"
+---
+
+# Welcome to My First Note
+
+This is the content of my note. I can use **Markdown** to format my text.
+
+## Features
+
+- Lists
+- **Bold** and *italic* text
+- `Code blocks`
+
+```javascript
+// Example code block
+function hello() {
+  return 'Hello, world!';
+}
+```
+```
+
+```javascript
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+
+greet('Reader'); // Output: Hello, Reader!
+```
+
+### Lists
+
+- **Bold text** and *italic text*
+- [Links](https://example.com)
+- `inline code`
+
+### Blockquotes
+
+> This is a blockquote. Great for highlighting important information.
+
+## Next Steps
+
+- [ ] Add more notes
+- [ ] Organize by categories
+- [ ] Add tags for better searchability
+
+---
+
+*Last updated: January 1, 2025*
