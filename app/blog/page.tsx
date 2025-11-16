@@ -1,54 +1,46 @@
 import Link from 'next/link';
+import { noteHandler } from '@/lib/note-handler';
 
-// This would typically be fetched from an API or CMS
-const allPosts = [
-  {
-    title: 'Getting Started with Next.js and Tailwind CSS',
-    date: 'November 15, 2025',
-    readTime: '5 min read',
-    category: 'Web Development',
-    slug: 'getting-started-with-nextjs'
-  },
-  {
-    title: 'The Art of Minimalist Design',
-    date: 'November 10, 2025',
-    readTime: '4 min read',
-    category: 'Design',
-    slug: 'minimalist-design'
-  },
-  {
-    title: 'State Management in React',
-    date: 'November 5, 2025',
-    readTime: '6 min read',
-    category: 'Development',
-    slug: 'state-management-in-react'
-  },
-  {
-    title: 'Building Accessible Web Apps',
-    date: 'October 28, 2025',
-    readTime: '7 min read',
-    category: 'Accessibility',
-    slug: 'accessible-web-apps'
-  },
-  {
-    title: 'The Future of CSS',
-    date: 'October 20, 2025',
-    readTime: '5 min read',
-    category: 'CSS',
-    slug: 'future-of-css'
-  }
-];
+// Posts will be fetched from a data source in the future
+const allPosts: Array<{
+  title: string;
+  date: string;
+  readTime: string;
+  category: string;
+  slug: string;
+}> = [];
 
-export default function BlogPage() {
-  // Group posts by year
-  const postsByYear = allPosts.reduce((acc, post) => {
+async function getAllContent() {
+  // Get all notes
+  const notes = await noteHandler.getAllNotes();
+  
+  // Transform notes to match post format
+  const noteItems = notes.map(note => ({
+    title: note.title || note.slug,
+    date: note.date || new Date().toISOString().split('T')[0],
+    readTime: note.readTime || '2 min read',
+    category: note.category || 'Note',
+    slug: `/notes/${note.slug}`
+  }));
+
+  // Combine with existing posts
+  return [...allPosts, ...noteItems].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+}
+
+export default async function BlogPage() {
+  const allContent = await getAllContent();
+  
+  // Group content by year
+  const postsByYear = allContent.reduce((acc, post) => {
     const year = new Date(post.date).getFullYear();
     if (!acc[year]) {
       acc[year] = [];
     }
     acc[year].push(post);
     return acc;
-  }, {} as Record<number, typeof allPosts>);
+  }, {} as Record<number, typeof allContent>);
 
   return (
     <div className="min-h-screen bg-black text-gray-100">

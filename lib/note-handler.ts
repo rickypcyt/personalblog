@@ -18,15 +18,40 @@ export class NoteHandler {
     return Date.now() - this.cacheTimestamp < this.CACHE_DURATION;
   }
 
-  private async scanNotesDirectory(): Promise<string[]> {
+  private async scanNotesDirectory(): Promise<Array<{ slug: string; path: string }>> {
     if (!fs.existsSync(this.notesDirectory)) {
       console.warn(`Notes directory not found: ${this.notesDirectory}`);
       return [];
     }
 
-    return fs.readdirSync(this.notesDirectory, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+    const notes: Array<{ slug: string; path: string }> = [];
+
+    // Scan for markdown files directly in the notes directory
+    const files = fs.readdirSync(this.notesDirectory, { withFileTypes: true });
+    
+    for (const dirent of files) {
+      // Skip directories that are routes (like [slug])
+      if (dirent.isDirectory() && !dirent.name.startsWith('[')) {
+        // Check for page.mdx in subdirectories
+        const pageMdxPath = path.join(this.notesDirectory, dirent.name, 'page.mdx');
+        if (fs.existsSync(pageMdxPath)) {
+          notes.push({ slug: dirent.name, path: pageMdxPath });
+        }
+      } else if (dirent.isFile()) {
+        // Check for .md or .mdx files directly in notes directory
+        const fileName = dirent.name;
+        if (fileName.endsWith('.md') || fileName.endsWith('.mdx')) {
+          // Skip page.mdx and page.tsx files that are route handlers
+          if (fileName !== 'page.mdx' && fileName !== 'page.tsx') {
+            const slug = fileName.replace(/\.(md|mdx)$/, '');
+            const filePath = path.join(this.notesDirectory, fileName);
+            notes.push({ slug, path: filePath });
+          }
+        }
+      }
+    }
+
+    return notes;
   }
 
   private parseNote(slug: string, content: string): PostData {
@@ -59,10 +84,9 @@ export class NoteHandler {
     }
 
     try {
-      const noteDirs = await this.scanNotesDirectory();
+      const noteFiles = await this.scanNotesDirectory();
       const notes = await Promise.all(
-        noteDirs.map(async (slug) => {
-          const notePath = path.join(this.notesDirectory, slug, 'page.mdx');
+        noteFiles.map(async ({ slug, path: notePath }) => {
           const content = fs.readFileSync(notePath, 'utf8');
           return this.parseNote(slug, content);
         })
@@ -91,10 +115,21 @@ export class NoteHandler {
     }
 
     try {
-      const notePath = path.join(this.notesDirectory, slug, 'page.mdx');
+      // First, try subdirectory with page.mdx (legacy format)
+      let notePath = path.join(this.notesDirectory, slug, 'page.mdx');
       
+      // If not found, try direct .md or .mdx file
       if (!fs.existsSync(notePath)) {
-        return null;
+        const mdPath = path.join(this.notesDirectory, `${slug}.md`);
+        const mdxPath = path.join(this.notesDirectory, `${slug}.mdx`);
+        
+        if (fs.existsSync(mdPath)) {
+          notePath = mdPath;
+        } else if (fs.existsSync(mdxPath)) {
+          notePath = mdxPath;
+        } else {
+          return null;
+        }
       }
 
       const content = fs.readFileSync(notePath, 'utf8');
