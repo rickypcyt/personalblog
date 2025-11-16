@@ -1,6 +1,6 @@
 import { noteHandler } from '@/lib/note-handler';
 import { getAllPosts } from '@/lib/posts';
-import HomePage from './home-page';
+import HomePage from './home';
 
 export default async function HomePageServer() {
   // Fetch data on the server

@@ -1,3 +1,10 @@
+---
+title: Hello, World!
+description: A simple markdown note example demonstrating markdown features and how to create notes
+category: Examples
+date: 2025-11-15
+---
+
 # Hello, World!
 
 This is a simple markdown note. You can use it to jot down your thoughts, ideas, or anything else you'd like to remember.

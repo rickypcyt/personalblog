@@ -3,9 +3,15 @@ import path from 'path';
 import matter from 'gray-matter';
 import { PostData } from './posts';
 
+export interface NoteData extends Omit<PostData, 'category'> {
+  // NoteData extends PostData but makes category optional and removes it from required fields
+  category?: string;
+  // Any additional note-specific fields can be added here
+}
+
 export class NoteHandler {
   private notesDirectory: string;
-  private cache: Map<string, any>;
+  private cache: Map<string, NoteData[] | NoteData>;
   private cacheTimestamp: number = 0;
   private CACHE_DURATION = 1000 * 60 * 5; // 5 minutes
 
@@ -54,19 +60,20 @@ export class NoteHandler {
     return notes;
   }
 
-  private parseNote(slug: string, content: string): PostData {
-    const { data, content: markdown } = matter(content);
+  private parseNote(slug: string, content: string): NoteData {
+    const { data, content: markdownContent } = matter(content);
+    const readTime = this.calculateReadTime(markdownContent);
     
     return {
       slug,
-      title: data.title || slug.replace(/-/g, ' '),
+      content: markdownContent,
+      title: data.title || 'Untitled Note',
       date: data.date || new Date().toISOString(),
       description: data.description || '',
       category: data.category || 'Uncategorized',
-      readTime: data.readTime || this.calculateReadTime(markdown),
-      content: markdown,
-      ...data,
-    };
+      readTime,
+      ...data
+    } as NoteData;
   }
 
   private calculateReadTime(content: string): string {
@@ -76,11 +83,12 @@ export class NoteHandler {
     return `${minutes} min read`;
   }
 
-  async getAllNotes(): Promise<PostData[]> {
+  async getAllNotes(): Promise<NoteData[]> {
     const cacheKey = 'all-notes';
     
     if (this.cache.has(cacheKey) && this.shouldUseCache()) {
-      return this.cache.get(cacheKey);
+      const cached = this.cache.get(cacheKey);
+      return Array.isArray(cached) ? cached : [];
     }
 
     try {
@@ -93,9 +101,11 @@ export class NoteHandler {
       );
 
       // Sort by date, newest first
-      const sortedNotes = notes.sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
+      const sortedNotes = notes.sort((a, b) => {
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+        return dateB - dateA;
+      });
 
       this.cache.set(cacheKey, sortedNotes);
       this.cacheTimestamp = Date.now();
@@ -107,11 +117,12 @@ export class NoteHandler {
     }
   }
 
-  async getNoteBySlug(slug: string): Promise<PostData | null> {
+  async getNoteBySlug(slug: string): Promise<NoteData | null> {
     const cacheKey = `note-${slug}`;
     
     if (this.cache.has(cacheKey) && this.shouldUseCache()) {
-      return this.cache.get(cacheKey);
+      const cached = this.cache.get(cacheKey);
+      return Array.isArray(cached) ? cached[0] || null : (cached || null);
     }
 
     try {
@@ -145,7 +156,7 @@ export class NoteHandler {
     }
   }
 
-  async getNotesByCategory(category: string): Promise<PostData[]> {
+  async getNotesByCategory(category: string): Promise<NoteData[]> {
     const notes = await this.getAllNotes();
     return notes.filter(note => 
       note.category?.toLowerCase() === category.toLowerCase()
@@ -165,15 +176,21 @@ export class NoteHandler {
     return Array.from(categories).sort();
   }
 
-  async searchNotes(query: string): Promise<PostData[]> {
+  async searchNotes(query: string): Promise<NoteData[]> {
     const notes = await this.getAllNotes();
     const queryLower = query.toLowerCase();
     
-    return notes.filter(note => 
-      note.title?.toLowerCase().includes(queryLower) ||
-      note.content?.toLowerCase().includes(queryLower) ||
-      note.description?.toLowerCase().includes(queryLower)
-    );
+    return notes.filter(note => {
+      const title = typeof note.title === 'string' ? note.title.toLowerCase() : '';
+      const content = typeof note.content === 'string' ? note.content.toLowerCase() : '';
+      const description = typeof note.description === 'string' ? note.description.toLowerCase() : '';
+      
+      return (
+        title.includes(queryLower) ||
+        content.includes(queryLower) ||
+        description.includes(queryLower)
+      );
+    });
   }
 }
 

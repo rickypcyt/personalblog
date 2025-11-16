@@ -15,13 +15,25 @@ async function getAllContent() {
   const notes = await noteHandler.getAllNotes();
   
   // Transform notes to match post format
-  const noteItems = notes.map(note => ({
-    title: note.title || note.slug,
-    date: note.date || new Date().toISOString().split('T')[0],
-    readTime: note.readTime || '2 min read',
-    category: note.category || 'Note',
-    slug: `/notes/${note.slug}`
-  }));
+  const noteItems = notes.map(note => {
+    // Ensure date is always a string
+    let dateStr: string;
+    if (!note.date) {
+      dateStr = new Date().toISOString().split('T')[0];
+    } else if (note.date instanceof Date) {
+      dateStr = note.date.toISOString().split('T')[0];
+    } else {
+      dateStr = String(note.date);
+    }
+    
+    return {
+      title: note.title || note.slug,
+      date: dateStr,
+      readTime: note.readTime || '2 min read',
+      category: note.category || 'Note',
+      slug: `/notes/${note.slug}`
+    };
+  });
 
   // Combine with existing posts
   return [...allPosts, ...noteItems].sort((a, b) => 
@@ -64,7 +76,21 @@ export default async function BlogPage() {
                           <h3 className="text-xl font-medium group-hover:text-gray-300 transition-colors">
                             {post.title}
                           </h3>
-                          <time className="text-sm text-gray-500">{post.date}</time>
+                          <time className="text-sm text-gray-500">
+                            {typeof post.date === 'string' 
+                              ? new Date(post.date).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })
+                              : post.date instanceof Date
+                              ? post.date.toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })
+                              : String(post.date)}
+                          </time>
                         </div>
                         <div className="mt-1 flex items-center text-sm text-gray-500">
                           <span>{post.category}</span>
