@@ -8,24 +8,19 @@ export default function Navbar() {
   const [activeLink, setActiveLink] = useState('home');
 
   const navItems = [
-    { name: 'Home', href: '/', id: 'home' },
-    { name: 'Blog', href: '/blog', id: 'blog' },
-    { name: 'Contact', href: '/contact', id: 'contact' },
+    { name: 'Portfolio', href: 'https://rickypcyt.vercel.app/', id: 'portfolio' },
   ];
 
-  const centerNavItems = [
-    { name: 'Home', href: '/', id: 'home' },
-    { name: 'Blog', href: '/blog', id: 'blog' },
-  ];
+  const centerNavItems = [] as Array<{name: string; href: string; id: string}>;
 
   return (
     <nav className="bg-black shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-20 relative">
           {/* Logo */}
-          <Link href="/" className="text-white font-bold text-2xl">
-            rickypcyt
-          </Link>
+          <div className="text-white font-bold text-2xl">
+            rickypcyt's blog
+          </div>
 
           {/* Center Navigation - Home and Blog */}
           <div className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
@@ -43,17 +38,19 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right side - Contact */}
+          {/* Right side - Portfolio */}
           <div className="hidden md:flex items-center">
-            <Link
-              href="/contact"
+            <a
+              href="https://rickypcyt.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className={`px-4 py-2 text-base font-medium ${
-                activeLink === 'contact' ? 'text-white' : 'text-gray-400 hover:text-white'
+                activeLink === 'portfolio' ? 'text-white' : 'text-gray-400 hover:text-white'
               } transition-colors duration-200`}
-              onClick={() => setActiveLink('contact')}
+              onClick={() => setActiveLink('portfolio')}
             >
-              Contact
-            </Link>
+              Portfolio
+            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -84,19 +81,37 @@ export default function Navbar() {
       <div className={`md:hidden ${isOpen ? 'block' : 'hidden'} bg-gray-900`}>
         <div className="px-2 pt-2 pb-3 space-y-1">
           {navItems.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={`block px-3 py-2 text-base font-medium ${
-                activeLink === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
-              }`}
-              onClick={() => {
-                setActiveLink(item.id);
-                setIsOpen(false);
-              }}
-            >
-              {item.name}
-            </Link>
+            item.href.startsWith('http') ? (
+              <a
+                key={item.id}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`block px-3 py-2 text-base font-medium ${
+                  activeLink === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
+                }`}
+                onClick={() => {
+                  setActiveLink(item.id);
+                  setIsOpen(false);
+                }}
+              >
+                {item.name}
+              </a>
+            ) : (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={`block px-3 py-2 text-base font-medium ${
+                  activeLink === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
+                }`}
+                onClick={() => {
+                  setActiveLink(item.id);
+                  setIsOpen(false);
+                }}
+              >
+                {item.name}
+              </Link>
+            )
           ))}
         </div>
       </div>
