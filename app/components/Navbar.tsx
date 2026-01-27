@@ -20,7 +20,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className=" transition-opacity">
             <div className="text-white font-bold text-2xl" style={{fontFamily: 'Helvetica, Arial, sans-serif'}}>
-              Rickypcyt&apos;s Blog
+              rickypcyt&apos;s blog
             </div>
           </Link>
 
@@ -46,7 +46,7 @@ export default function Navbar() {
               href="https://rickypcyt.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`px-4 py-2 text-base font-medium ${
+              className={`px-4 py-2 text-lg font-bold ${
                 activeLink === 'portfolio' ? 'text-white' : 'text-white hover:text-white'
               } transition-colors duration-200`}
               style={{fontFamily: 'Helvetica, Arial, sans-serif'}}
@@ -90,7 +90,7 @@ export default function Navbar() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`block px-3 py-2 text-base font-medium ${
+                className={`block px-3 py-2 text-lg font-bold ${
                   activeLink === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
                 }`}
                 style={{fontFamily: 'Helvetica, Arial, sans-serif'}}
@@ -105,7 +105,7 @@ export default function Navbar() {
               <Link
                 key={item.id}
                 href={item.href}
-                className={`block px-3 py-2 text-base font-medium ${
+                className={`block px-3 py-2 text-lg font-bold ${
                   activeLink === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
                 }`}
                 style={{fontFamily: 'Helvetica, Arial, sans-serif'}}
