@@ -102,16 +102,16 @@ export default async function Page() {
                             })}
                           </time>
                         </div>
-                        <div className="mt-1 flex items-center text-sm text-gray-500">
-                          <span>{post.category}</span>
-                          <span className="mx-2">•</span>
-                          <span>{post.readTime}</span>
-                        </div>
                         {post.content && (
                           <p className="mt-2 text-sm text-gray-400 line-clamp-3">
                             {getFirstLines(post.content)}
                           </p>
                         )}
+                        <div className="mt-1 flex items-center text-sm text-gray-500">
+                          <span>{post.category}</span>
+                          <span className="mx-2">•</span>
+                          <span>{post.readTime}</span>
+                        </div>
                       </Link>
                     </article>
                   ))}

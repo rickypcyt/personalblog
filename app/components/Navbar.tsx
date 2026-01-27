@@ -14,12 +14,12 @@ export default function Navbar() {
   const centerNavItems = [] as Array<{name: string; href: string; id: string}>;
 
   return (
-    <nav className="bg-black shadow-lg">
-      <div className="max-w-7xl mx-auto px-4">
+    <nav className="bg-black shadow-lg w-full">
+      <div className="w-full mx-auto px-4">
         <div className="flex justify-between items-center h-20 relative">
           {/* Logo */}
-          <div className="text-white font-bold text-2xl">
-            rickypcyt's blog
+          <div className="text-white font-bold text-2xl" style={{fontFamily: 'Helvetica, Arial, sans-serif'}}>
+            rickypcyt&apos;s blog
           </div>
 
           {/* Center Navigation - Home and Blog */}
@@ -45,8 +45,9 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               className={`px-4 py-2 text-base font-medium ${
-                activeLink === 'portfolio' ? 'text-white' : 'text-gray-400 hover:text-white'
+                activeLink === 'portfolio' ? 'text-white' : 'text-white hover:text-white'
               } transition-colors duration-200`}
+              style={{fontFamily: 'Helvetica, Arial, sans-serif'}}
               onClick={() => setActiveLink('portfolio')}
             >
               Portfolio
@@ -90,6 +91,7 @@ export default function Navbar() {
                 className={`block px-3 py-2 text-base font-medium ${
                   activeLink === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
                 }`}
+                style={{fontFamily: 'Helvetica, Arial, sans-serif'}}
                 onClick={() => {
                   setActiveLink(item.id);
                   setIsOpen(false);
@@ -104,6 +106,7 @@ export default function Navbar() {
                 className={`block px-3 py-2 text-base font-medium ${
                   activeLink === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
                 }`}
+                style={{fontFamily: 'Helvetica, Arial, sans-serif'}}
                 onClick={() => {
                   setActiveLink(item.id);
                   setIsOpen(false);
