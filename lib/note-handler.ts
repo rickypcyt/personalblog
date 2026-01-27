@@ -13,7 +13,7 @@ export class NoteHandler {
   private notesDirectory: string;
   private cache: Map<string, NoteData[] | NoteData>;
   private cacheTimestamp: number = 0;
-  private CACHE_DURATION = 1000 * 60 * 5; // 5 minutes
+  private CACHE_DURATION = 1000 * 30; // 30 seconds for development
 
   constructor(notesDir: string = path.join(process.cwd(), 'app/notes')) {
     this.notesDirectory = notesDir;

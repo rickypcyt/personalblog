@@ -13,7 +13,7 @@ interface HomePageProps {
   posts: PostData[];
 }
 
-export default function Home({ latestNote, posts: _posts }: HomePageProps) {
+export default function Home({ latestNote }: HomePageProps) {
   return (
     <div className="h-full bg-black text-gray-100">
       <div className="max-w-2xl mx-auto px-4 py-12">
