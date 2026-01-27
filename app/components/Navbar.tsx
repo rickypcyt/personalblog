@@ -14,13 +14,15 @@ export default function Navbar() {
   const centerNavItems = [] as Array<{name: string; href: string; id: string}>;
 
   return (
-    <nav className="bg-black shadow-lg w-full">
+    <nav className="sticky top-0 z-50 bg-black/80 backdrop-blur-sm shadow-lg w-full border-b border-black">
       <div className="w-full mx-auto px-4">
-        <div className="flex justify-between items-center h-20 relative">
+        <div className="flex justify-between items-center h-18 relative">
           {/* Logo */}
-          <div className="text-white font-bold text-2xl" style={{fontFamily: 'Helvetica, Arial, sans-serif'}}>
-            rickypcyt&apos;s blog
-          </div>
+          <Link href="/" className=" transition-opacity">
+            <div className="text-white font-bold text-2xl" style={{fontFamily: 'Helvetica, Arial, sans-serif'}}>
+              Rickypcyt&apos;s Blog
+            </div>
+          </Link>
 
           {/* Center Navigation - Home and Blog */}
           <div className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">

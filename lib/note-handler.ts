@@ -1,12 +1,16 @@
-import { PostData } from './posts';
 import fs from 'fs';
 import matter from 'gray-matter';
 import path from 'path';
 
-export interface NoteData extends Omit<PostData, 'category'> {
-  // NoteData extends PostData but makes category optional and removes it from required fields
+export interface NoteData {
+  slug: string;
+  content: string;
+  title: string;
+  date: string | Date;
+  description: string;
+  readTime: string;
   category?: string;
-  // Any additional note-specific fields can be added here
+  [key: string]: unknown; // For any additional frontmatter fields
 }
 
 export class NoteHandler {

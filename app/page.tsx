@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { noteHandler } from '@/lib/note-handler';
 
-// Type for blog post list items
-type BlogPostItem = {
+// Type for note list items
+type NoteItem = {
   title: string;
   date: string;
   readTime: string;
@@ -10,9 +10,6 @@ type BlogPostItem = {
   slug: string;
   content?: string;
 };
-
-// Posts will be fetched from a data source in the future
-const allPosts: BlogPostItem[] = [];
 
 // Function to get first 3 lines of content
 function getFirstLines(content: string, maxLines: number = 3): string {
@@ -28,12 +25,12 @@ function getFirstLines(content: string, maxLines: number = 3): string {
     .substring(0, 150) + (selectedLines.join(' ').length > 150 ? '...' : '');
 }
 
-async function getAllContent(): Promise<BlogPostItem[]> {
+async function getAllNotes(): Promise<NoteItem[]> {
   // Get all notes
   const notes = await noteHandler.getAllNotes();
   
   // Transform notes to match post format
-  const noteItems: BlogPostItem[] = notes.map(note => {
+  return notes.map(note => {
     // Ensure date is always a string
     let dateStr: string;
     if (!note.date) {
@@ -52,65 +49,62 @@ async function getAllContent(): Promise<BlogPostItem[]> {
       slug: `/notes/${note.slug}`,
       content: String(note.content || '')
     };
-  });
-
-  // Combine with existing posts
-  return [...allPosts, ...noteItems].sort((a, b) => 
+  }).sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 }
 
 export default async function Page() {
-  const allContent = await getAllContent();
+  const notes = await getAllNotes();
   
-  // Group content by year
-  const postsByYear = allContent.reduce((acc, post) => {
-    const year = new Date(post.date).getFullYear();
+  // Group notes by year
+  const notesByYear = notes.reduce((acc, note) => {
+    const year = new Date(note.date).getFullYear();
     if (!acc[year]) {
       acc[year] = [];
     }
-    acc[year].push(post);
+    acc[year].push(note);
     return acc;
-  }, {} as Record<number, BlogPostItem[]>);
+  }, {} as Record<number, NoteItem[]>);
 
   return (
     <div className="h-full bg-black text-gray-100">
-      <div className="max-w-2xl mx-auto px-4 py-4">
-        <div className="mb-12">
+      <div className="prose prose-invert max-w-4xl mx-auto p-4">
+        <div className="my-6">
           <p className="text-gray-400 text-center">Thoughts, tutorials, and insights on web development and design.</p>
         </div>
 
         <div className="space-y-12">
-          {Object.entries(postsByYear)
+          {Object.entries(notesByYear)
             .sort(([yearA], [yearB]) => parseInt(yearB) - parseInt(yearA))
-            .map(([year, posts]) => (
+            .map(([year, yearNotes]) => (
               <section key={year} className="space-y-6">
                 <h2 className="text-2xl font-semibold text-gray-300">{year}</h2>
                 <div className="space-y-6 border-l border-gray-800 pl-4">
-                  {posts.map((post, index) => (
+                  {yearNotes.map((note, index) => (
                     <article key={index} className="group relative">
-                      <Link href={post.slug.startsWith('/') ? post.slug : `/blog/${post.slug}`} className="block">
+                      <Link href={note.slug} className="block">
                         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                           <h3 className="text-xl font-medium group-hover:text-gray-300 transition-colors">
-                            {post.title}
+                            {note.title}
                           </h3>
                           <time className="text-sm text-gray-500">
-                            {new Date(post.date).toLocaleDateString('en-US', {
+                            {new Date(note.date).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
                             })}
                           </time>
                         </div>
-                        {post.content && (
+                        {note.content && (
                           <p className="mt-2 text-sm text-gray-400 line-clamp-3">
-                            {getFirstLines(post.content)}
+                            {getFirstLines(note.content)}
                           </p>
                         )}
                         <div className="mt-1 flex items-center text-sm text-gray-500">
-                          <span>{post.category}</span>
+                          <span>{note.category}</span>
                           <span className="mx-2">•</span>
-                          <span>{post.readTime}</span>
+                          <span>{note.readTime}</span>
                         </div>
                       </Link>
                     </article>
