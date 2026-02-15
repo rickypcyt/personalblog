@@ -8,6 +8,7 @@ export default function Navbar() {
   const [activeLink, setActiveLink] = useState('home');
 
   const navItems = [
+    { name: 'Dotfiles', href: '/dotfiles', id: 'dotfiles' },
     { name: 'Portfolio', href: 'https://rickypcyt.vercel.app/', id: 'portfolio' },
   ];
 
@@ -40,8 +41,18 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right side - Portfolio */}
-          <div className="hidden md:flex items-center">
+          {/* Right side - Dotfiles and Portfolio */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Link
+              href="/dotfiles"
+              className={`px-4 py-2 text-lg font-bold ${
+                activeLink === 'dotfiles' ? 'text-white' : 'text-white hover:text-white'
+              } transition-colors duration-200`}
+              style={{fontFamily: 'Helvetica, Arial, sans-serif'}}
+              onClick={() => setActiveLink('dotfiles')}
+            >
+              dotfiles & linux config
+            </Link>
             <a
               href="https://rickypcyt.vercel.app/"
               target="_blank"
